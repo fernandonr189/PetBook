@@ -3,6 +3,7 @@ package com.example.petbook.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val lilac_background = Color(0xFFBFD9EE)
+val aqua_blue = Color(0xFF62D1D9)
 
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
