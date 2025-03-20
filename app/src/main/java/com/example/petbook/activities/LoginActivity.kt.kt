@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.petbook.R
 import com.example.petbook.ui.theme.PetBookTheme
 
@@ -70,8 +71,10 @@ class LoginActivity : ComponentActivity() {
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.Bottom,
                                 horizontalArrangement = Arrangement.SpaceBetween) {
-                                Column {
-                                    Text(text = "Si ya tienes una cuenta")
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.padding(horizontal = 16.dp)) {
+                                    Text(text = "Si ya tienes una cuenta", fontSize = 12.sp)
                                     ElevatedButton(
                                         colors = ButtonColors(
                                             containerColor = MaterialTheme.colorScheme.background,
