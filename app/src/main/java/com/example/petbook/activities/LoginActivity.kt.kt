@@ -22,7 +22,6 @@ import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.insert
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
@@ -30,7 +29,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,12 +36,10 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.petbook.R
 import com.example.petbook.ui.theme.PetBookTheme
-import org.jetbrains.annotations.Nls.Capitalization
 
 class LoginActivity : ComponentActivity() {
     @SuppressLint("UnrememberedMutableState")
@@ -180,7 +176,7 @@ class LoginActivity : ComponentActivity() {
         }
     }
 }
-@Stable
+
 data class PasswordOutputTransformation(val char: String) : OutputTransformation {
     override fun TextFieldBuffer.transformOutput() {
         replace(0, length, char.repeat(length))
@@ -199,7 +195,7 @@ fun FormField(
     Column(modifier = modifier) {
         Text(text = text)
         BasicTextField(
-            outputTransformation = if (isPassword) PasswordOutputTransformation("*") else null,
+            outputTransformation = if (isPassword) PasswordOutputTransformation("●") else null,
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Unspecified,
                 keyboardType = inputType),
