@@ -18,8 +18,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.OutputTransformation
+import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.insert
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,6 +38,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.petbook.R
@@ -48,7 +53,9 @@ class LoginActivity : ComponentActivity() {
             this.finish()
         }
 
-        val formFieldModifier = Modifier.fillMaxWidth().height(64.dp)
+        val formFieldModifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
 
         val phoneTextFieldState = TextFieldState()
         val passwordTextFieldState = TextFieldState()
@@ -147,7 +154,8 @@ class LoginActivity : ComponentActivity() {
                                             text = "Elija una contraseña:",
                                             modifier = formFieldModifier,
                                             inputType = KeyboardType.Password,
-                                            textFieldState = passwordTextFieldState)
+                                            textFieldState = passwordTextFieldState,
+                                            isPassword = true)
                                     }
                                     Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)) {
                                         FormField(
@@ -172,15 +180,26 @@ class LoginActivity : ComponentActivity() {
         }
     }
 }
+@Stable
+data class PasswordOutputTransformation(val char: String) : OutputTransformation {
+    override fun TextFieldBuffer.transformOutput() {
+        replace(0, length, char.repeat(length))
+    }
+}
+
 
 @Composable
-fun FormField(modifier: Modifier, textFieldState: TextFieldState, text: String, inputType: KeyboardType) {
+fun FormField(
+    modifier: Modifier,
+    textFieldState: TextFieldState,
+    text: String,
+    inputType: KeyboardType,
+    isPassword: Boolean = false
+) {
     Column(modifier = modifier) {
         Text(text = text)
         BasicTextField(
-            outputTransformation = {
-
-            },
+            outputTransformation = if (isPassword) PasswordOutputTransformation("*") else null,
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Unspecified,
                 keyboardType = inputType),
