@@ -1,12 +1,12 @@
 package com.example.petbook.activities
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -16,28 +16,29 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.petbook.R
 import com.example.petbook.ui.theme.PetBookTheme
+import org.jetbrains.annotations.Nls.Capitalization
 
 class LoginActivity : ComponentActivity() {
     @SuppressLint("UnrememberedMutableState")
@@ -47,7 +48,12 @@ class LoginActivity : ComponentActivity() {
             this.finish()
         }
 
-        val formFieldModifier = Modifier.fillMaxWidth().height(32.dp)
+        val formFieldModifier = Modifier.fillMaxWidth().height(64.dp)
+
+        val phoneTextFieldState = TextFieldState()
+        val passwordTextFieldState = TextFieldState()
+        val petNameTextField = TextFieldState()
+        val petAgeTextField = TextFieldState()
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -66,7 +72,7 @@ class LoginActivity : ComponentActivity() {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 64.dp),
+                                    .padding(vertical = 48.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally) {
                                 Image(
                                     painter = painterResource(id = R.drawable.petbook_logo),
@@ -77,7 +83,7 @@ class LoginActivity : ComponentActivity() {
                                 )
                                 Image(
                                     painter = painterResource(id = R.drawable.app_logo),
-                                    contentDescription = "app_logo",
+                                     contentDescription = "app_logo",
                                     modifier = Modifier
                                         .width(133.dp)
                                         .height(133.dp)
@@ -129,9 +135,34 @@ class LoginActivity : ComponentActivity() {
                                         .fillMaxWidth()
                                         .padding(32.dp)
                                 ) {
-                                    FormField(text = "Numero telefónico o correo electrónico", modifier = formFieldModifier, onValueChange = { value ->
-                                        Log.println(Log.ERROR, "INPUT", "New value: $value")
-                                    })
+                                    Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)) {
+                                        FormField(
+                                            text = "Numero telefónico o correo electrónico:",
+                                            modifier = formFieldModifier,
+                                            inputType = KeyboardType.Email,
+                                            textFieldState = phoneTextFieldState)
+                                    }
+                                    Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)) {
+                                        FormField(
+                                            text = "Elija una contraseña:",
+                                            modifier = formFieldModifier,
+                                            inputType = KeyboardType.Password,
+                                            textFieldState = passwordTextFieldState)
+                                    }
+                                    Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)) {
+                                        FormField(
+                                            text = "Nombre de su mascota:",
+                                            modifier = formFieldModifier,
+                                            inputType = KeyboardType.Text,
+                                            textFieldState = petNameTextField)
+                                    }
+                                    Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)) {
+                                        FormField(
+                                            text = "Edad de la mascota:",
+                                            modifier = formFieldModifier,
+                                            inputType = KeyboardType.Number,
+                                            textFieldState = petAgeTextField)
+                                    }
                                 }
                             }
                         }
@@ -143,22 +174,30 @@ class LoginActivity : ComponentActivity() {
 }
 
 @Composable
-fun FormField(modifier: Modifier, onValueChange: (String) -> Unit, text: String) {
-    var textFieldValue by remember { mutableStateOf("") }
-    Column {
+fun FormField(modifier: Modifier, textFieldState: TextFieldState, text: String, inputType: KeyboardType) {
+    Column(modifier = modifier) {
         Text(text = text)
-        TextField(
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent
-            ),
-            shape = RoundedCornerShape(16.dp),
-            singleLine = true,
-            value = textFieldValue,
-            onValueChange= { value ->
-            textFieldValue = value
-            onValueChange(textFieldValue)
-        }, modifier = modifier)
+        BasicTextField(
+            outputTransformation = {
+
+            },
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Unspecified,
+                keyboardType = inputType),
+            modifier = Modifier.fillMaxSize(),
+            lineLimits = TextFieldLineLimits.SingleLine,
+            decorator = { innerTextField ->
+                Surface(
+                    color = Color.White,
+                    shape = RoundedCornerShape(12.dp)) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically) {
+                        innerTextField()
+                    }
+                }
+            },
+            state = textFieldState
+        )
     }
 }
