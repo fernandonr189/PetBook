@@ -9,13 +9,13 @@ fun createUserAccount(
     password: String,
     context: Activity,
     onUserCreated: () -> Unit,
-    onFail: () -> Unit) {
+    onFail: (String) -> Unit) {
     auth.createUserWithEmailAndPassword(email, password)
         .addOnCompleteListener(context) { task ->
             if (task.isSuccessful) {
                 onUserCreated()
             } else {
-                onFail()
+                onFail(task.exception?.message.toString())
             }
         }
 }
