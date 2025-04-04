@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -153,8 +154,8 @@ class LoginActivity : ComponentActivity(){
 
     @Composable
     fun LoginForm(modifier: Modifier) {
-        val emailTextFieldState = TextFieldState()
-        val passwordTextFieldState = TextFieldState()
+        val emailTextFieldState by remember { mutableStateOf(TextFieldState()) }
+        val passwordTextFieldState by remember { mutableStateOf(TextFieldState()) }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
@@ -177,7 +178,15 @@ class LoginActivity : ComponentActivity(){
                     isPassword = true
                 )
             }
-            Button(onClick = {
+            Button(
+                colors = ButtonColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    contentColor = ButtonDefaults.buttonColors().contentColor,
+                    disabledContainerColor = ButtonDefaults.buttonColors().disabledContainerColor,
+                    disabledContentColor = ButtonDefaults.buttonColors().disabledContentColor
+                ),
+                modifier = Modifier.padding(vertical = 8.dp),
+                onClick = {
                 if(emailTextFieldState.text.isEmpty()) {
                     Toast.makeText(this@LoginActivity, "El correo electrónico no puede estar vacío", Toast.LENGTH_SHORT).show()
                     return@Button
@@ -206,9 +215,9 @@ class LoginActivity : ComponentActivity(){
 
     @Composable
     fun SignupForm(modifier: Modifier) {
-        val emailTextFieldState = TextFieldState()
-        val passwordTextFieldState = TextFieldState()
-        val confirmPasswordTextFieldState = TextFieldState()
+        val emailTextFieldState by remember { mutableStateOf(TextFieldState()) }
+        val passwordTextFieldState by remember { mutableStateOf(TextFieldState()) }
+        val confirmPasswordTextFieldState by remember { mutableStateOf(TextFieldState()) }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
@@ -240,7 +249,15 @@ class LoginActivity : ComponentActivity(){
                     isPassword = true
                 )
             }
-            Button(onClick = {
+            Button(
+                colors = ButtonColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    contentColor = ButtonDefaults.buttonColors().contentColor,
+                    disabledContainerColor = ButtonDefaults.buttonColors().disabledContainerColor,
+                    disabledContentColor = ButtonDefaults.buttonColors().disabledContentColor
+                ),
+                modifier = Modifier.padding(vertical = 8.dp),
+                onClick = {
                 if(emailTextFieldState.text.isEmpty()) {
                     Toast.makeText(this@LoginActivity, "El correo electrónico no puede estar vacío", Toast.LENGTH_SHORT).show()
                     return@Button
