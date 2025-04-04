@@ -1,6 +1,6 @@
 package com.example.petbook.activities
-import android.annotation.SuppressLint
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -40,23 +40,39 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.petbook.R
 import com.example.petbook.ui.theme.PetBookTheme
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
+import com.example.petbook.util.createUserAccount
 
-class LoginActivity : ComponentActivity() {
-    @SuppressLint("UnrememberedMutableState")
+class LoginActivity : ComponentActivity(){
+
+    private lateinit var auth: FirebaseAuth
+
+    private fun signupButtonOnClick(email: String, password: String)  {
+        createUserAccount(
+            auth,
+            email,
+            password,
+            this,
+            {
+                Toast.makeText(this, "Cuenta creada", Toast.LENGTH_SHORT).show()
+            },
+            {
+                Toast.makeText(this, "Error al crear la cuenta", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        val closeActivity: () -> Unit = {
-            this.finish()
-        }
+        auth = Firebase.auth
 
         val formFieldModifier = Modifier
             .fillMaxWidth()
             .height(64.dp)
 
-        val phoneTextFieldState = TextFieldState()
+        val emailTextFieldState = TextFieldState()
         val passwordTextFieldState = TextFieldState()
-        val petNameTextField = TextFieldState()
-        val petAgeTextField = TextFieldState()
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -108,7 +124,7 @@ class LoginActivity : ComponentActivity() {
                                             disabledContentColor = Color.Black
                                         ),
                                         shape = RectangleShape,
-                                        onClick = { closeActivity() }) {
+                                        onClick = { Toast.makeText(applicationContext, "Unimplemented", Toast.LENGTH_SHORT).show() }) {
                                         Text("INICIA SESIÓN")
                                     }
                                 }
@@ -119,7 +135,9 @@ class LoginActivity : ComponentActivity() {
                                         disabledContainerColor = MaterialTheme.colorScheme.primary,
                                         disabledContentColor = Color.White
                                     ),
-                                    onClick = { closeActivity() },
+                                    onClick = {
+                                        signupButtonOnClick(emailTextFieldState.text.toString(),
+                                        passwordTextFieldState.text.toString()) },
                                     shape = RoundedCornerShape(
                                         topStart = 16.dp,
                                         bottomStart = 16.dp),
@@ -140,10 +158,10 @@ class LoginActivity : ComponentActivity() {
                                 ) {
                                     Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)) {
                                         FormField(
-                                            text = "Numero telefónico o correo electrónico:",
+                                            text = "Correo electrónico:",
                                             modifier = formFieldModifier,
                                             inputType = KeyboardType.Email,
-                                            textFieldState = phoneTextFieldState)
+                                            textFieldState = emailTextFieldState)
                                     }
                                     Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)) {
                                         FormField(
@@ -151,21 +169,8 @@ class LoginActivity : ComponentActivity() {
                                             modifier = formFieldModifier,
                                             inputType = KeyboardType.Password,
                                             textFieldState = passwordTextFieldState,
-                                            isPassword = true)
-                                    }
-                                    Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)) {
-                                        FormField(
-                                            text = "Nombre de su mascota:",
-                                            modifier = formFieldModifier,
-                                            inputType = KeyboardType.Text,
-                                            textFieldState = petNameTextField)
-                                    }
-                                    Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)) {
-                                        FormField(
-                                            text = "Edad de la mascota:",
-                                            modifier = formFieldModifier,
-                                            inputType = KeyboardType.Number,
-                                            textFieldState = petAgeTextField)
+                                            isPassword = true
+                                        )
                                     }
                                 }
                             }
@@ -182,7 +187,6 @@ data class PasswordOutputTransformation(val char: String) : OutputTransformation
         replace(0, length, char.repeat(length))
     }
 }
-
 
 @Composable
 fun FormField(
