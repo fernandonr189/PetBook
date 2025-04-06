@@ -44,6 +44,7 @@ import com.google.firebase.auth.auth
 import com.example.petbook.util.signUpFirebase
 import com.example.petbook.components.FormField
 import com.example.petbook.util.loginFirebase
+import com.example.petbook.util.passwordReset
 
 class LoginActivity : ComponentActivity(){
 
@@ -64,7 +65,7 @@ class LoginActivity : ComponentActivity(){
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            var authMode by remember { mutableStateOf(AuthMode.SIGN_UP) }
+            var authMode by remember { mutableStateOf(AuthMode.LOG_IN) }
             PetBookTheme(darkTheme = false, dynamicColor =  false) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Surface(
@@ -193,6 +194,36 @@ class LoginActivity : ComponentActivity(){
                 }
             }) {
                 Text(text = "Continuar")
+            }
+            Column(
+                modifier = Modifier.padding(vertical = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "¿Problemas para inicar sesión?")
+                Button( onClick = {
+                    if(emailTextFieldState.text.isEmpty()) {
+                        Toast.makeText(this@LoginActivity, "Introduzca un correo electronico para recuperar su contraseña", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+                    passwordReset(
+                        auth, emailTextFieldState.text.toString(), onEmailSent = {
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "Correo enviado correctamente",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }, onFail = { exception ->
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "Ha ocurrido un error al enviar el correo de recuperación: $exception",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    },
+                        context = this@LoginActivity
+                    )
+                } ) {
+                    Text(text = "Olvidé mi contraseña")
+                }
             }
         }
     }
