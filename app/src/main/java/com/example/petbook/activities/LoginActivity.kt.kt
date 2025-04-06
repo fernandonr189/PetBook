@@ -164,8 +164,8 @@ class LoginActivity : ComponentActivity(){
             }
             Button(
                 colors = ButtonColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    contentColor = ButtonDefaults.buttonColors().contentColor,
+                    containerColor = MaterialTheme.colorScheme.onPrimary,
+                    contentColor = MaterialTheme.colorScheme.background,
                     disabledContainerColor = ButtonDefaults.buttonColors().disabledContainerColor,
                     disabledContentColor = ButtonDefaults.buttonColors().disabledContentColor
                 ),
@@ -235,8 +235,8 @@ class LoginActivity : ComponentActivity(){
             }
             Button(
                 colors = ButtonColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    contentColor = ButtonDefaults.buttonColors().contentColor,
+                    containerColor = MaterialTheme.colorScheme.onPrimary,
+                    contentColor = MaterialTheme.colorScheme.background,
                     disabledContainerColor = ButtonDefaults.buttonColors().disabledContainerColor,
                     disabledContentColor = ButtonDefaults.buttonColors().disabledContentColor
                 ),
