@@ -33,11 +33,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.petbook.R
 import com.example.petbook.ui.theme.PetBookTheme
 import com.google.firebase.Firebase
@@ -101,24 +99,7 @@ class LoginActivity : ComponentActivity(){
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.Bottom,
-                                horizontalArrangement = Arrangement.SpaceBetween) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    modifier = Modifier.padding(horizontal = 16.dp)) {
-                                    Text(text = "Si ya tienes una cuenta", fontSize = 12.sp)
-                                    ElevatedButton(
-                                        onClick = { authMode = AuthMode.LOG_IN },
-                                        colors = ButtonColors(
-                                            containerColor = MaterialTheme.colorScheme.background,
-                                            contentColor = Color.Black,
-                                            disabledContainerColor = MaterialTheme.colorScheme.background,
-                                            disabledContentColor = Color.Black
-                                        ),
-                                        shape = RectangleShape
-                                    ) {
-                                        Text("INICIA SESIÓN")
-                                    }
-                                }
+                                horizontalArrangement = Arrangement.End) {
                                 ElevatedButton(
                                     colors = ButtonColors(
                                         containerColor = MaterialTheme.colorScheme.primary,
@@ -126,12 +107,15 @@ class LoginActivity : ComponentActivity(){
                                         disabledContainerColor = MaterialTheme.colorScheme.primary,
                                         disabledContentColor = Color.White
                                     ),
-                                    onClick = { authMode = AuthMode.SIGN_UP },
+                                    onClick = { authMode = if(authMode == AuthMode.SIGN_UP) AuthMode.LOG_IN else AuthMode.SIGN_UP },
                                     shape = RoundedCornerShape(
                                         topStart = 16.dp,
                                         bottomStart = 16.dp),
                                 ) {
-                                    Text("REGISTRARME")
+                                    Text(when(authMode) {
+                                        AuthMode.SIGN_UP -> "INICIAR SESIÓN"
+                                        AuthMode.LOG_IN -> "REGISTRARME"
+                                    })
                                 }
                             }
                             Surface(
