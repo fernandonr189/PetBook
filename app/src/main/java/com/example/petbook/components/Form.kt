@@ -31,7 +31,7 @@ data class PasswordOutputTransformation(val char: String) : OutputTransformation
 fun FormField(
     modifier: Modifier,
     textFieldState: TextFieldState,
-    text: String,
+    text: String = "",
     inputType: KeyboardType,
     isPassword: Boolean = false
 ) {
@@ -44,6 +44,41 @@ fun FormField(
                 keyboardType = inputType),
             modifier = Modifier.fillMaxSize(),
             lineLimits = TextFieldLineLimits.SingleLine,
+            decorator = { innerTextField ->
+                Surface(
+                    color = Color.White,
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically) {
+                        innerTextField()
+                    }
+                }
+            },
+            state = textFieldState
+        )
+    }
+}
+
+@Composable
+fun FormFieldArea(
+    modifier: Modifier,
+    textFieldState: TextFieldState,
+    text: String = "",
+    inputType: KeyboardType,
+    isPassword: Boolean = false,
+    maxHeightInLines: Int
+) {
+    Column(modifier = modifier) {
+        Text(text = text)
+        BasicTextField(
+            outputTransformation = if (isPassword) PasswordOutputTransformation("●") else null,
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Unspecified,
+                keyboardType = inputType),
+            modifier = Modifier.fillMaxSize(),
+            lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = maxHeightInLines),
             decorator = { innerTextField ->
                 Surface(
                     color = Color.White,

@@ -1,4 +1,5 @@
 package com.example.petbook.activities
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -172,6 +173,9 @@ class LoginActivity : ComponentActivity(){
                 ),
                 modifier = Modifier.padding(vertical = 8.dp),
                 onClick = {
+                    val intent = Intent(this@LoginActivity, OnboardingProfileForm::class.java)
+                    startActivity(intent)
+                    return@Button
                 if(emailTextFieldState.text.isEmpty()) {
                     Toast.makeText(this@LoginActivity, "El correo electrónico no puede estar vacío", Toast.LENGTH_SHORT).show()
                     return@Button
