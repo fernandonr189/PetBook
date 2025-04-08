@@ -42,10 +42,6 @@ import com.example.petbook.ui.theme.PetBookTheme
 
 class OnboardingProfileForm : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val formFieldModifier = Modifier
-            .fillMaxWidth()
-            .height(64.dp)
-
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -62,7 +58,7 @@ class OnboardingProfileForm : ComponentActivity() {
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text("Crear perfil", fontSize = 32.sp, textAlign = TextAlign.Center)
-                            UserProfileForm(formFieldModifier)
+                            UserProfileForm()
                         }
                     }
                 }
@@ -71,34 +67,39 @@ class OnboardingProfileForm : ComponentActivity() {
     }
 
     @Composable
-    fun UserProfileForm(modifier: Modifier) {
+    fun UserProfileForm() {
         val emailTextFieldState by remember { mutableStateOf(TextFieldState()) }
+        val textFieldBoxModifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)
+        val formFieldModifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(32.dp)
         ) {
-            Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)) {
+            Box(modifier = textFieldBoxModifier) {
                 FormField(
                     text = "Nombre:",
-                    modifier = modifier,
+                    modifier = formFieldModifier,
                     inputType = KeyboardType.Email,
                     textFieldState = emailTextFieldState
                 )
             }
-            Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)) {
+            Box(modifier = textFieldBoxModifier) {
                 FormField(
                     text = "Nombre de usuario:",
-                    modifier = modifier,
+                    modifier = formFieldModifier,
                     inputType = KeyboardType.Email,
                     textFieldState = emailTextFieldState
                 )
             }
-            Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)) {
+            Box(modifier = textFieldBoxModifier) {
                 FormField(
                     text = "Colonia o localidad (opcional):",
-                    modifier = modifier,
+                    modifier = formFieldModifier,
                     inputType = KeyboardType.Email,
                     textFieldState = emailTextFieldState
                 )

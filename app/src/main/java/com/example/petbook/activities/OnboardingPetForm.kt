@@ -53,11 +53,6 @@ class OnboardingPetForm : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        val formFieldModifier = Modifier
-            .fillMaxWidth()
-            .height(64.dp)
-
         setContent {
             PetBookTheme(darkTheme = false, dynamicColor = false) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -76,7 +71,7 @@ class OnboardingPetForm : ComponentActivity() {
                                 fontSize = 32.sp,
                                 textAlign = TextAlign.Center
                             )
-                            PetProfileForm(formFieldModifier)
+                            PetProfileForm()
                         }
                     }
                 }
@@ -85,28 +80,34 @@ class OnboardingPetForm : ComponentActivity() {
     }
 
     @Composable
-    fun PetProfileForm(modifier: Modifier) {
+    fun PetProfileForm() {
         val agesList = (0..30).toList()
         val emailTextFieldState by remember { mutableStateOf(TextFieldState()) }
         var selectedAge by remember { mutableIntStateOf(agesList[0]) }
         var expanded by remember { mutableStateOf(false) }
+
+        val formFieldModifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+        val textFieldBoxModifier = Modifier.padding(vertical = 8.dp)
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(32.dp)
         ) {
-            Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)) {
+            Box(modifier = textFieldBoxModifier) {
                 FormField(
                     text = "Nombre:",
-                    modifier = modifier,
+                    modifier = formFieldModifier,
                     inputType = KeyboardType.Email,
                     textFieldState = emailTextFieldState
                 )
             }
-            Box(modifier = Modifier
-                .padding(vertical = 8.dp, horizontal = 0.dp)
-                .fillMaxWidth()) {
+            Box(
+                modifier = textFieldBoxModifier
+                    .fillMaxWidth()
+            ) {
                 Row(
                     modifier = Modifier.clickable { expanded = !expanded },
                     horizontalArrangement = Arrangement.Start
@@ -136,10 +137,10 @@ class OnboardingPetForm : ComponentActivity() {
                     }
                 }
             }
-            Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)) {
+            Box(modifier = textFieldBoxModifier) {
                 FormField(
                     text = "Raza (opcional):",
-                    modifier = modifier,
+                    modifier = formFieldModifier,
                     inputType = KeyboardType.Email,
                     textFieldState = emailTextFieldState
                 )
