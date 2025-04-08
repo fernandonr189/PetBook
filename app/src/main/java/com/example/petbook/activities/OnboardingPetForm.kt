@@ -1,19 +1,15 @@
 package com.example.petbook.activities
 
 import android.content.Intent
-import android.graphics.drawable.Icon
 import android.os.Bundle
-import android.util.Range
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -52,7 +48,6 @@ import com.example.petbook.ui.theme.PetBookTheme
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.window.PopupProperties
 
 class OnboardingPetForm : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,11 +65,17 @@ class OnboardingPetForm : ComponentActivity() {
                         modifier = Modifier
                             .padding(top = 28.dp)
                             .padding(top = innerPadding.calculateTopPadding()),
-                        color = MaterialTheme.colorScheme.background) {
+                        color = MaterialTheme.colorScheme.background
+                    ) {
                         Column(
                             modifier = Modifier.fillMaxHeight(),
-                            horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("¡Presentanos a tus mascotas!", fontSize = 32.sp, textAlign = TextAlign.Center)
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                "¡Preséntanos a tus mascotas!",
+                                fontSize = 32.sp,
+                                textAlign = TextAlign.Center
+                            )
                             PetProfileForm(formFieldModifier)
                         }
                     }
@@ -82,6 +83,7 @@ class OnboardingPetForm : ComponentActivity() {
             }
         }
     }
+
     @Composable
     fun PetProfileForm(modifier: Modifier) {
         val agesList = (0..30).toList()
@@ -99,11 +101,16 @@ class OnboardingPetForm : ComponentActivity() {
                     text = "Nombre:",
                     modifier = modifier,
                     inputType = KeyboardType.Email,
-                    textFieldState = emailTextFieldState)
+                    textFieldState = emailTextFieldState
+                )
             }
-            Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp).fillMaxWidth()) {
-                Row(modifier = Modifier.clickable { expanded = !expanded },
-                    horizontalArrangement = Arrangement.Start) {
+            Box(modifier = Modifier
+                .padding(vertical = 8.dp, horizontal = 0.dp)
+                .fillMaxWidth()) {
+                Row(
+                    modifier = Modifier.clickable { expanded = !expanded },
+                    horizontalArrangement = Arrangement.Start
+                ) {
                     Text("Edad: $selectedAge año(s)")
                     Icon(Icons.Filled.ArrowDropDown, "")
                     DropdownMenu(
@@ -111,13 +118,18 @@ class OnboardingPetForm : ComponentActivity() {
                             expanded = false
                         },
                         expanded = expanded,
-                        modifier = Modifier.height(256.dp)) {
+                        modifier = Modifier.height(256.dp)
+                    ) {
                         for (age in agesList) {
                             DropdownMenuItem(
-                                text = { Text("$age",
-                                    color = if (age == selectedAge)
-                                        MaterialTheme.colorScheme.primary
-                                        else Color.Black) },
+                                text = {
+                                    Text(
+                                        "$age",
+                                        color = if (age == selectedAge)
+                                            MaterialTheme.colorScheme.primary
+                                        else Color.Black
+                                    )
+                                },
                                 onClick = { selectedAge = age; expanded = false }
                             )
                         }
@@ -129,7 +141,8 @@ class OnboardingPetForm : ComponentActivity() {
                     text = "Raza (opcional):",
                     modifier = modifier,
                     inputType = KeyboardType.Email,
-                    textFieldState = emailTextFieldState)
+                    textFieldState = emailTextFieldState
+                )
             }
             Column(
                 modifier = Modifier.padding(vertical = 32.dp, horizontal = 0.dp),

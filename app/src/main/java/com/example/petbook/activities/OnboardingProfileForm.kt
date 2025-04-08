@@ -2,15 +2,12 @@ package com.example.petbook.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,7 +38,6 @@ import com.example.petbook.R
 import com.example.petbook.components.FormField
 import com.example.petbook.components.FormFieldArea
 import com.example.petbook.ui.theme.PetBookTheme
-import com.example.petbook.util.signUpFirebase
 
 
 class OnboardingProfileForm : ComponentActivity() {
@@ -59,10 +55,12 @@ class OnboardingProfileForm : ComponentActivity() {
                         modifier = Modifier
                             .padding(top = 28.dp)
                             .padding(top = innerPadding.calculateTopPadding()),
-                        color = MaterialTheme.colorScheme.background) {
+                        color = MaterialTheme.colorScheme.background
+                    ) {
                         Column(
                             modifier = Modifier.fillMaxHeight(),
-                            horizontalAlignment = Alignment.CenterHorizontally) {
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
                             Text("Crear perfil", fontSize = 32.sp, textAlign = TextAlign.Center)
                             UserProfileForm(formFieldModifier)
                         }
@@ -71,6 +69,7 @@ class OnboardingProfileForm : ComponentActivity() {
             }
         }
     }
+
     @Composable
     fun UserProfileForm(modifier: Modifier) {
         val emailTextFieldState by remember { mutableStateOf(TextFieldState()) }
@@ -85,21 +84,24 @@ class OnboardingProfileForm : ComponentActivity() {
                     text = "Nombre:",
                     modifier = modifier,
                     inputType = KeyboardType.Email,
-                    textFieldState = emailTextFieldState)
+                    textFieldState = emailTextFieldState
+                )
             }
             Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)) {
                 FormField(
                     text = "Nombre de usuario:",
                     modifier = modifier,
                     inputType = KeyboardType.Email,
-                    textFieldState = emailTextFieldState)
+                    textFieldState = emailTextFieldState
+                )
             }
             Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)) {
                 FormField(
                     text = "Colonia o localidad (opcional):",
                     modifier = modifier,
                     inputType = KeyboardType.Email,
-                    textFieldState = emailTextFieldState)
+                    textFieldState = emailTextFieldState
+                )
             }
             Column(
                 modifier = Modifier.padding(vertical = 32.dp, horizontal = 0.dp),

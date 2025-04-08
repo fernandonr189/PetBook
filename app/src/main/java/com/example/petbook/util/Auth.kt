@@ -9,12 +9,12 @@ fun passwordReset(
     email: String,
     context: Activity,
     onEmailSent: () -> Unit,
-    onFail: (String) -> Unit) {
+    onFail: (String) -> Unit
+) {
     auth.sendPasswordResetEmail(email).addOnCompleteListener(context) { task ->
         if (task.isSuccessful) {
             onEmailSent()
-        }
-        else {
+        } else {
             onFail(task.exception?.message.toString())
         }
     }
@@ -26,7 +26,8 @@ fun signUpFirebase(
     password: String,
     context: Activity,
     onUserCreated: () -> Unit,
-    onFail: (String) -> Unit) {
+    onFail: (String) -> Unit
+) {
     auth.createUserWithEmailAndPassword(email, password)
         .addOnCompleteListener(context) { task ->
             if (task.isSuccessful) {
@@ -43,7 +44,8 @@ fun loginFirebase(
     password: String,
     context: Activity,
     onLoginSuccessful: () -> Unit,
-    onFail: (String) -> Unit) {
+    onFail: (String) -> Unit
+) {
     auth.signInWithEmailAndPassword(email, password)
         .addOnCompleteListener(context) { task ->
             if (task.isSuccessful) {

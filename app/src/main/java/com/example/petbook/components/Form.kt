@@ -43,7 +43,8 @@ fun FormField(
             outputTransformation = if (isPassword) PasswordOutputTransformation("●") else null,
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Unspecified,
-                keyboardType = inputType),
+                keyboardType = inputType
+            ),
             modifier = Modifier.fillMaxSize(),
             lineLimits = TextFieldLineLimits.SingleLine,
             decorator = { innerTextField ->
@@ -53,7 +54,8 @@ fun FormField(
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
-                        verticalAlignment = Alignment.CenterVertically) {
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         innerTextField()
                     }
                 }
@@ -78,8 +80,11 @@ fun FormFieldArea(
             outputTransformation = if (isPassword) PasswordOutputTransformation("●") else null,
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Unspecified,
-                keyboardType = inputType),
-            modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 128.dp),
+                keyboardType = inputType
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = 128.dp),
             lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = maxHeightInLines),
             decorator = { innerTextField ->
                 Surface(
@@ -88,7 +93,8 @@ fun FormFieldArea(
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.Top) {
+                        verticalAlignment = Alignment.Top
+                    ) {
                         innerTextField()
                     }
                 }
