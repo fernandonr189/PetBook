@@ -68,7 +68,11 @@ class OnboardingProfileForm : ComponentActivity() {
 
     @Composable
     fun UserProfileForm() {
-        val emailTextFieldState by remember { mutableStateOf(TextFieldState()) }
+        val nameTextFieldState by remember { mutableStateOf(TextFieldState()) }
+        val nickNameTextFieldState by remember { mutableStateOf(TextFieldState()) }
+        val townTextFieldState by remember { mutableStateOf(TextFieldState()) }
+        val descriptionTextFieldState by remember { mutableStateOf(TextFieldState()) }
+
         val textFieldBoxModifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)
         val formFieldModifier = Modifier
             .fillMaxWidth()
@@ -85,7 +89,7 @@ class OnboardingProfileForm : ComponentActivity() {
                     text = "Nombre:",
                     modifier = formFieldModifier,
                     inputType = KeyboardType.Email,
-                    textFieldState = emailTextFieldState
+                    textFieldState = nameTextFieldState
                 )
             }
             Box(modifier = textFieldBoxModifier) {
@@ -93,7 +97,7 @@ class OnboardingProfileForm : ComponentActivity() {
                     text = "Nombre de usuario:",
                     modifier = formFieldModifier,
                     inputType = KeyboardType.Email,
-                    textFieldState = emailTextFieldState
+                    textFieldState = nickNameTextFieldState
                 )
             }
             Box(modifier = textFieldBoxModifier) {
@@ -101,7 +105,7 @@ class OnboardingProfileForm : ComponentActivity() {
                     text = "Colonia o localidad (opcional):",
                     modifier = formFieldModifier,
                     inputType = KeyboardType.Email,
-                    textFieldState = emailTextFieldState
+                    textFieldState = townTextFieldState
                 )
             }
             Column(
@@ -124,7 +128,7 @@ class OnboardingProfileForm : ComponentActivity() {
             FormFieldArea(
                 modifier = Modifier.fillMaxWidth(),
                 inputType = KeyboardType.Text,
-                textFieldState = emailTextFieldState,
+                textFieldState = descriptionTextFieldState,
                 maxHeightInLines = 8
             )
             Button(
