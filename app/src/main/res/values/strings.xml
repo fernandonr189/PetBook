@@ -2,4 +2,5 @@
     <string name="app_name">PetBook</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_main2">MainActivity2</string>
+    <string name="title_activity_onboarding_pet_form">OnboardingPetForm</string>
 </resources>

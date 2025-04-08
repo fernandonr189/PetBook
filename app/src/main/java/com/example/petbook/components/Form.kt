@@ -2,7 +2,9 @@ package com.example.petbook.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -77,7 +79,7 @@ fun FormFieldArea(
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Unspecified,
                 keyboardType = inputType),
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 128.dp),
             lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = maxHeightInLines),
             decorator = { innerTextField ->
                 Surface(
@@ -85,8 +87,8 @@ fun FormFieldArea(
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
-                        verticalAlignment = Alignment.CenterVertically) {
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.Top) {
                         innerTextField()
                     }
                 }

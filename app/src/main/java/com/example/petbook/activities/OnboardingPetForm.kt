@@ -1,15 +1,19 @@
 package com.example.petbook.activities
 
 import android.content.Intent
+import android.graphics.drawable.Icon
 import android.os.Bundle
-import android.widget.Toast
+import android.util.Range
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,9 +22,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -41,17 +49,20 @@ import com.example.petbook.R
 import com.example.petbook.components.FormField
 import com.example.petbook.components.FormFieldArea
 import com.example.petbook.ui.theme.PetBookTheme
-import com.example.petbook.util.signUpFirebase
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.window.PopupProperties
 
-
-class OnboardingProfileForm : ComponentActivity() {
+class OnboardingPetForm : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+
         val formFieldModifier = Modifier
             .fillMaxWidth()
             .height(64.dp)
 
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             PetBookTheme(darkTheme = false, dynamicColor = false) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -63,8 +74,8 @@ class OnboardingProfileForm : ComponentActivity() {
                         Column(
                             modifier = Modifier.fillMaxHeight(),
                             horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Crear perfil", fontSize = 32.sp, textAlign = TextAlign.Center)
-                            UserProfileForm(formFieldModifier)
+                            Text("¡Presentanos a tus mascotas!", fontSize = 32.sp, textAlign = TextAlign.Center)
+                            PetProfileForm(formFieldModifier)
                         }
                     }
                 }
@@ -72,8 +83,11 @@ class OnboardingProfileForm : ComponentActivity() {
         }
     }
     @Composable
-    fun UserProfileForm(modifier: Modifier) {
+    fun PetProfileForm(modifier: Modifier) {
+        val agesList = (0..30).toList()
         val emailTextFieldState by remember { mutableStateOf(TextFieldState()) }
+        var selectedAge by remember { mutableIntStateOf(agesList[0]) }
+        var expanded by remember { mutableStateOf(false) }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
@@ -87,16 +101,32 @@ class OnboardingProfileForm : ComponentActivity() {
                     inputType = KeyboardType.Email,
                     textFieldState = emailTextFieldState)
             }
-            Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)) {
-                FormField(
-                    text = "Nombre de usuario:",
-                    modifier = modifier,
-                    inputType = KeyboardType.Email,
-                    textFieldState = emailTextFieldState)
+            Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp).fillMaxWidth()) {
+                Row(modifier = Modifier.clickable { expanded = !expanded },
+                    horizontalArrangement = Arrangement.Start) {
+                    Text("Edad: $selectedAge año(s)")
+                    Icon(Icons.Filled.ArrowDropDown, "")
+                    DropdownMenu(
+                        onDismissRequest = {
+                            expanded = false
+                        },
+                        expanded = expanded,
+                        modifier = Modifier.height(256.dp)) {
+                        for (age in agesList) {
+                            DropdownMenuItem(
+                                text = { Text("$age",
+                                    color = if (age == selectedAge)
+                                        MaterialTheme.colorScheme.primary
+                                        else Color.Black) },
+                                onClick = { selectedAge = age; expanded = false }
+                            )
+                        }
+                    }
+                }
             }
             Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 0.dp)) {
                 FormField(
-                    text = "Colonia o localidad (opcional):",
+                    text = "Raza (opcional):",
                     modifier = modifier,
                     inputType = KeyboardType.Email,
                     textFieldState = emailTextFieldState)
@@ -105,7 +135,7 @@ class OnboardingProfileForm : ComponentActivity() {
                 modifier = Modifier.padding(vertical = 32.dp, horizontal = 0.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Añadir foto de perfil", modifier = Modifier.padding(bottom = 8.dp))
+                Text("Añade una foto de tu mascota", modifier = Modifier.padding(bottom = 8.dp))
                 Surface(
                     color = Color.White,
                     shape = RoundedCornerShape(12.dp),
@@ -133,7 +163,7 @@ class OnboardingProfileForm : ComponentActivity() {
                 ),
                 modifier = Modifier.padding(vertical = 8.dp),
                 onClick = {
-                    val intent = Intent(this@OnboardingProfileForm, OnboardingPetForm::class.java)
+                    val intent = Intent(this@OnboardingPetForm, OnboardingPetForm::class.java)
                     startActivity(intent)
                 }) {
                 Text(text = "Continuar")
