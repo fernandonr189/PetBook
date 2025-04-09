@@ -51,14 +51,14 @@ import com.example.petbook.util.passwordReset
 class LoginActivity : ComponentActivity() {
 
     enum class AuthMode {
-        SIGN_UP,
-        LOG_IN
+        SIGN_UP, LOG_IN
     }
 
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         auth = Firebase.auth
+
 
         val formFieldModifier = Modifier
             .fillMaxWidth()
@@ -118,8 +118,7 @@ class LoginActivity : ComponentActivity() {
                                             if (authMode == AuthMode.SIGN_UP) AuthMode.LOG_IN else AuthMode.SIGN_UP
                                     },
                                     shape = RoundedCornerShape(
-                                        topStart = 16.dp,
-                                        bottomStart = 16.dp
+                                        topStart = 16.dp, bottomStart = 16.dp
                                     ),
                                 ) {
                                     Text(
@@ -148,6 +147,7 @@ class LoginActivity : ComponentActivity() {
             }
         }
     }
+
 
     @Composable
     fun LoginForm(modifier: Modifier) {
@@ -182,42 +182,10 @@ class LoginActivity : ComponentActivity() {
                     contentColor = MaterialTheme.colorScheme.background,
                     disabledContainerColor = ButtonDefaults.buttonColors().disabledContainerColor,
                     disabledContentColor = ButtonDefaults.buttonColors().disabledContentColor
-                ),
-                modifier = Modifier.padding(vertical = 8.dp),
-                onClick = {
-                    if (emailTextFieldState.text.isEmpty()) {
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "El correo electrónico no puede estar vacío",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        return@Button
-                    } else if (passwordTextFieldState.text.isEmpty()) {
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "La contraseña no puede estar vacía",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        return@Button
-                    } else {
-                        loginFirebase(
-                            auth,
-                            emailTextFieldState.text.toString(),
-                            passwordTextFieldState.text.toString(),
-                            this@LoginActivity,
-                            {
-                                Toast.makeText(this@LoginActivity, "Bienvenido", Toast.LENGTH_SHORT)
-                                    .show()
-                                val intent =
-                                    Intent(this@LoginActivity, OnboardingProfileForm::class.java)
-                                startActivity(intent)
-                            },
-                            { exception ->
-                                Toast.makeText(this@LoginActivity, exception, Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                        )
-                    }
+                ), modifier = Modifier.padding(vertical = 8.dp), onClick = {
+                    doLogin(
+                        emailTextFieldState.text.toString(), passwordTextFieldState.text.toString()
+                    )
                 }) {
                 Text(text = "Continuar")
             }
@@ -248,8 +216,7 @@ class LoginActivity : ComponentActivity() {
                                 "Ha ocurrido un error al enviar el correo de recuperación: $exception",
                                 Toast.LENGTH_SHORT
                             ).show()
-                        },
-                        context = this@LoginActivity
+                        }, context = this@LoginActivity
                     )
                 }) {
                     Text(text = "Olvidé mi contraseña")
@@ -301,52 +268,65 @@ class LoginActivity : ComponentActivity() {
                     contentColor = MaterialTheme.colorScheme.background,
                     disabledContainerColor = ButtonDefaults.buttonColors().disabledContainerColor,
                     disabledContentColor = ButtonDefaults.buttonColors().disabledContentColor
-                ),
-                modifier = Modifier.padding(vertical = 8.dp),
-                onClick = {
-                    if (emailTextFieldState.text.isEmpty()) {
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "El correo electrónico no puede estar vacío",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        return@Button
-                    } else if (passwordTextFieldState.text.isEmpty()) {
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "La contraseña no puede estar vacía",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        return@Button
-                    } else if (passwordTextFieldState.text != confirmPasswordTextFieldState.text) {
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "Las contraseñas no coinciden",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        return@Button
-                    } else {
-                        signUpFirebase(
-                            auth,
-                            emailTextFieldState.text.toString(),
-                            passwordTextFieldState.text.toString(),
-                            this@LoginActivity,
-                            {
-                                Toast.makeText(
-                                    this@LoginActivity,
-                                    "Cuenta creada",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            },
-                            { exception ->
-                                Toast.makeText(this@LoginActivity, exception, Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                        )
-                    }
+                ), modifier = Modifier.padding(vertical = 8.dp), onClick = {
+                    doSignUp(
+                        emailTextFieldState.text.toString(),
+                        passwordTextFieldState.text.toString(),
+                        confirmPasswordTextFieldState.text.toString()
+                    )
                 }) {
                 Text(text = "Continuar")
             }
+        }
+    }
+
+
+    private fun doLogin(email: String, password: String) {
+        if (email.isEmpty()) {
+            Toast.makeText(
+                this@LoginActivity, "El correo electrónico no puede estar vacío", Toast.LENGTH_SHORT
+            ).show()
+            return
+        } else if (password.isEmpty()) {
+            Toast.makeText(
+                this@LoginActivity, "La contraseña no puede estar vacía", Toast.LENGTH_SHORT
+            ).show()
+            return
+        } else {
+            loginFirebase(auth, email, password, this@LoginActivity, {
+                Toast.makeText(this@LoginActivity, "Bienvenido", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this@LoginActivity, OnboardingProfileForm::class.java)
+                startActivity(intent)
+            }, { exception ->
+                Toast.makeText(this@LoginActivity, exception, Toast.LENGTH_SHORT).show()
+            })
+        }
+    }
+
+    private fun doSignUp(email: String, password: String, passwordConfirmation: String) {
+        if (email.isEmpty()) {
+            Toast.makeText(
+                this@LoginActivity, "El correo electrónico no puede estar vacío", Toast.LENGTH_SHORT
+            ).show()
+            return
+        } else if (password.isEmpty()) {
+            Toast.makeText(
+                this@LoginActivity, "La contraseña no puede estar vacía", Toast.LENGTH_SHORT
+            ).show()
+            return
+        } else if (password != passwordConfirmation) {
+            Toast.makeText(
+                this@LoginActivity, "Las contraseñas no coinciden", Toast.LENGTH_SHORT
+            ).show()
+            return
+        } else {
+            signUpFirebase(auth, email, password, this@LoginActivity, {
+                Toast.makeText(
+                    this@LoginActivity, "Cuenta creada", Toast.LENGTH_SHORT
+                ).show()
+            }, { exception ->
+                Toast.makeText(this@LoginActivity, exception, Toast.LENGTH_SHORT).show()
+            })
         }
     }
 }

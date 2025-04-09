@@ -3,20 +3,25 @@ package com.example.petbook
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import com.example.petbook.activities.LoginActivity
-import com.example.petbook.ui.theme.PetBookTheme
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var auth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            PetBookTheme {
-            }
+        auth = Firebase.auth
+
+        val intent = if(auth.currentUser != null) {
+            Intent(this, LoginActivity::class.java)
+        } else {
+            Intent(this, LoginActivity::class.java)
         }
-        val intent = Intent(this, LoginActivity::class.java)
         startActivity(intent)
+        finish()
     }
 }
