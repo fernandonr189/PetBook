@@ -19,6 +19,7 @@ class MainActivity : ComponentActivity() {
         val intent = if(auth.currentUser != null) {
             Intent(this, LoginActivity::class.java)
         } else {
+            // TODO Go to feed (feed unavailable atm, back to login instead)
             Intent(this, LoginActivity::class.java)
         }
         startActivity(intent)

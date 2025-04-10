@@ -1,22 +1,19 @@
 package com.example.petbook.util
 
-import android.app.Activity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
+enum class OnboardingStatus {
+    NOT_STARTED, PROFILE_COMPLETE, PET_PROFILE_COMPLETE, ERROR
+}
 
 fun passwordReset(
-    auth: FirebaseAuth,
-    email: String,
-    context: Activity,
-    onEmailSent: () -> Unit,
-    onFail: (String) -> Unit
+    auth: FirebaseAuth, email: String, onEmailSent: () -> Unit, onFail: (String?) -> Unit
 ) {
-    auth.sendPasswordResetEmail(email).addOnCompleteListener(context) { task ->
-        if (task.isSuccessful) {
-            onEmailSent()
-        } else {
-            onFail(task.exception?.message.toString())
-        }
+    auth.sendPasswordResetEmail(email).addOnSuccessListener {
+        onEmailSent()
+    }.addOnFailureListener { exception ->
+        onFail(exception.message)
     }
 }
 
@@ -24,34 +21,34 @@ fun signUpFirebase(
     auth: FirebaseAuth,
     email: String,
     password: String,
-    context: Activity,
-    onUserCreated: () -> Unit,
-    onFail: (String) -> Unit
+    onFail: (String?) -> Unit,
+    onSuccess: (FirebaseUser) -> Unit
 ) {
-    auth.createUserWithEmailAndPassword(email, password)
-        .addOnCompleteListener(context) { task ->
-            if (task.isSuccessful) {
-                onUserCreated()
-            } else {
-                onFail(task.exception?.message.toString())
-            }
+    auth.createUserWithEmailAndPassword(email, password).addOnSuccessListener { result ->
+        if (result.user == null) {
+            onFail("User is null")
+        } else {
+            onSuccess(result.user!!)
         }
+    }.addOnFailureListener { exception ->
+        onFail(exception.message)
+    }
 }
 
 fun loginFirebase(
     auth: FirebaseAuth,
     email: String,
     password: String,
-    context: Activity,
-    onLoginSuccessful: () -> Unit,
-    onFail: (String) -> Unit
+    onFail: (String?) -> Unit,
+    onSuccess: (FirebaseUser) -> Unit
 ) {
-    auth.signInWithEmailAndPassword(email, password)
-        .addOnCompleteListener(context) { task ->
-            if (task.isSuccessful) {
-                onLoginSuccessful()
-            } else {
-                onFail(task.exception?.message.toString())
-            }
+    auth.signInWithEmailAndPassword(email, password).addOnSuccessListener { result ->
+        if (result.user != null) {
+            onSuccess(result.user!!)
+        } else {
+            onFail("User does not exist")
         }
+    }.addOnFailureListener { exception ->
+        onFail(exception.message)
+    }
 }

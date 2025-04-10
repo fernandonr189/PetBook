@@ -45,20 +45,26 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.example.petbook.util.signUpFirebase
 import com.example.petbook.components.FormField
+import com.example.petbook.util.OnboardingStatus
+import com.example.petbook.util.getDocument
 import com.example.petbook.util.loginFirebase
 import com.example.petbook.util.passwordReset
+import com.example.petbook.util.storeDocument
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 
 class LoginActivity : ComponentActivity() {
 
-    enum class AuthMode {
+    private enum class AuthMode {
         SIGN_UP, LOG_IN
     }
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         auth = Firebase.auth
-
+        db = Firebase.firestore
 
         val formFieldModifier = Modifier
             .fillMaxWidth()
@@ -150,7 +156,7 @@ class LoginActivity : ComponentActivity() {
 
 
     @Composable
-    fun LoginForm(modifier: Modifier) {
+    private fun LoginForm(modifier: Modifier) {
         val emailTextFieldState by remember { mutableStateOf(TextFieldState()) }
         val passwordTextFieldState by remember { mutableStateOf(TextFieldState()) }
         Column(
@@ -183,6 +189,20 @@ class LoginActivity : ComponentActivity() {
                     disabledContainerColor = ButtonDefaults.buttonColors().disabledContainerColor,
                     disabledContentColor = ButtonDefaults.buttonColors().disabledContentColor
                 ), modifier = Modifier.padding(vertical = 8.dp), onClick = {
+                    if (emailTextFieldState.text.isEmpty()) {
+                        Toast.makeText(
+                            this@LoginActivity, "El correo no puede estar vacio", Toast.LENGTH_SHORT
+                        ).show()
+                        return@Button
+                    }
+                    if (passwordTextFieldState.text.isEmpty()) {
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "La contraseña no puede estar vacia",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@Button
+                    }
                     doLogin(
                         emailTextFieldState.text.toString(), passwordTextFieldState.text.toString()
                     )
@@ -204,19 +224,21 @@ class LoginActivity : ComponentActivity() {
                         return@Button
                     }
                     passwordReset(
-                        auth, emailTextFieldState.text.toString(), onEmailSent = {
+                        auth, emailTextFieldState.text.toString(),
+                        onEmailSent = {
                             Toast.makeText(
                                 this@LoginActivity,
                                 "Correo enviado correctamente",
                                 Toast.LENGTH_SHORT
                             ).show()
-                        }, onFail = { exception ->
+                        },
+                        onFail = { exception ->
                             Toast.makeText(
                                 this@LoginActivity,
                                 "Ha ocurrido un error al enviar el correo de recuperación: $exception",
                                 Toast.LENGTH_SHORT
                             ).show()
-                        }, context = this@LoginActivity
+                        },
                     )
                 }) {
                     Text(text = "Olvidé mi contraseña")
@@ -226,7 +248,7 @@ class LoginActivity : ComponentActivity() {
     }
 
     @Composable
-    fun SignupForm(modifier: Modifier) {
+    private fun SignupForm(modifier: Modifier) {
         val emailTextFieldState by remember { mutableStateOf(TextFieldState()) }
         val passwordTextFieldState by remember { mutableStateOf(TextFieldState()) }
         val confirmPasswordTextFieldState by remember { mutableStateOf(TextFieldState()) }
@@ -269,10 +291,31 @@ class LoginActivity : ComponentActivity() {
                     disabledContainerColor = ButtonDefaults.buttonColors().disabledContainerColor,
                     disabledContentColor = ButtonDefaults.buttonColors().disabledContentColor
                 ), modifier = Modifier.padding(vertical = 8.dp), onClick = {
+                    if (emailTextFieldState.text.isEmpty()) {
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "El correo electrónico no puede estar vacío",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@Button
+                    }
+                    if (passwordTextFieldState.text.isEmpty()) {
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "La contraseña no puede estar vacía",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@Button
+                    }
+                    if (passwordTextFieldState.text != confirmPasswordTextFieldState.text) {
+                        Toast.makeText(
+                            this@LoginActivity, "Las contraseñas no coinciden", Toast.LENGTH_SHORT
+                        ).show()
+                        return@Button
+                    }
                     doSignUp(
                         emailTextFieldState.text.toString(),
                         passwordTextFieldState.text.toString(),
-                        confirmPasswordTextFieldState.text.toString()
                     )
                 }) {
                 Text(text = "Continuar")
@@ -280,53 +323,68 @@ class LoginActivity : ComponentActivity() {
         }
     }
 
-
     private fun doLogin(email: String, password: String) {
-        if (email.isEmpty()) {
+        loginFirebase(auth, email, password, onFail = { _ ->
             Toast.makeText(
-                this@LoginActivity, "El correo electrónico no puede estar vacío", Toast.LENGTH_SHORT
+                this, "El usuario no existe o sus credenciales son incorrectas", Toast.LENGTH_SHORT
             ).show()
-            return
-        } else if (password.isEmpty()) {
-            Toast.makeText(
-                this@LoginActivity, "La contraseña no puede estar vacía", Toast.LENGTH_SHORT
-            ).show()
-            return
-        } else {
-            loginFirebase(auth, email, password, this@LoginActivity, {
-                Toast.makeText(this@LoginActivity, "Bienvenido", Toast.LENGTH_SHORT).show()
-                val intent = Intent(this@LoginActivity, OnboardingProfileForm::class.java)
+        }) { user ->
+            getDocument(db, "users", user.uid, { _ ->
+                storeDocument(
+                    db,
+                    "users",
+                    user.uid,
+                    hashMapOf("onboardingStatus" to OnboardingStatus.NOT_STARTED),
+                    {
+                        val intent = Intent(this, OnboardingProfileForm::class.java)
+                        startActivity(intent)
+                    },
+                    { _ ->
+                        Toast.makeText(
+                            this, "Ha ocurrido un problema al iniciar sesión", Toast.LENGTH_SHORT
+                        ).show()
+                    })
+            }) { userData ->
+                val onboardingStatus =
+                    OnboardingStatus.valueOf(userData["onboardingStatus"].toString())
+                val intent = when (onboardingStatus) {
+                    OnboardingStatus.NOT_STARTED -> Intent(
+                        this, OnboardingProfileForm::class.java
+                    )
+
+                    OnboardingStatus.PROFILE_COMPLETE -> Intent(
+                        this, OnboardingPetForm::class.java
+                    )
+
+                    OnboardingStatus.PET_PROFILE_COMPLETE -> TODO()
+                    OnboardingStatus.ERROR -> TODO()
+                }
                 startActivity(intent)
-            }, { exception ->
-                Toast.makeText(this@LoginActivity, exception, Toast.LENGTH_SHORT).show()
-            })
+                finish()
+            }
         }
     }
 
-    private fun doSignUp(email: String, password: String, passwordConfirmation: String) {
-        if (email.isEmpty()) {
+    private fun doSignUp(email: String, password: String) {
+        signUpFirebase(auth, email, password, onFail = { _ ->
             Toast.makeText(
-                this@LoginActivity, "El correo electrónico no puede estar vacío", Toast.LENGTH_SHORT
+                this, "El usuario no existe o sus credenciales son incorrectas", Toast.LENGTH_SHORT
             ).show()
-            return
-        } else if (password.isEmpty()) {
-            Toast.makeText(
-                this@LoginActivity, "La contraseña no puede estar vacía", Toast.LENGTH_SHORT
-            ).show()
-            return
-        } else if (password != passwordConfirmation) {
-            Toast.makeText(
-                this@LoginActivity, "Las contraseñas no coinciden", Toast.LENGTH_SHORT
-            ).show()
-            return
-        } else {
-            signUpFirebase(auth, email, password, this@LoginActivity, {
-                Toast.makeText(
-                    this@LoginActivity, "Cuenta creada", Toast.LENGTH_SHORT
-                ).show()
-            }, { exception ->
-                Toast.makeText(this@LoginActivity, exception, Toast.LENGTH_SHORT).show()
-            })
+        }) { user ->
+            storeDocument(
+                db,
+                "users",
+                user.uid,
+                hashMapOf("onboardingStatus" to OnboardingStatus.NOT_STARTED),
+                {
+                    val intent = Intent(this, OnboardingProfileForm::class.java)
+                    startActivity(intent)
+                },
+                { _ ->
+                    Toast.makeText(
+                        this, "Ha ocurrido un problema al iniciar sesión", Toast.LENGTH_SHORT
+                    ).show()
+                })
         }
     }
 }
