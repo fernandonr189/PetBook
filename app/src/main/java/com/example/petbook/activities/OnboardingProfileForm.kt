@@ -28,12 +28,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -48,13 +50,14 @@ import com.example.petbook.ui.theme.PetBookTheme
 class OnboardingProfileForm : ComponentActivity() {
 
     private lateinit var resultLauncher: ActivityResultLauncher<Intent>
-    private var imageBitmap: Bitmap? = null
+    private var profilePictureState: MutableState<Bitmap?> = mutableStateOf(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         createResultLauncher()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val profilePicture by profilePictureState
             PetBookTheme(darkTheme = false, dynamicColor = false) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Surface(
@@ -68,7 +71,7 @@ class OnboardingProfileForm : ComponentActivity() {
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text("Crear perfil", fontSize = 32.sp, textAlign = TextAlign.Center)
-                            UserProfileForm()
+                            UserProfileForm(profilePicture = profilePicture)
                         }
                     }
                 }
@@ -77,7 +80,7 @@ class OnboardingProfileForm : ComponentActivity() {
     }
 
     @Composable
-    fun UserProfileForm() {
+    fun UserProfileForm(profilePicture: Bitmap?) {
         val nameTextFieldState by remember { mutableStateOf(TextFieldState()) }
         val nickNameTextFieldState by remember { mutableStateOf(TextFieldState()) }
         val townTextFieldState by remember { mutableStateOf(TextFieldState()) }
@@ -107,11 +110,19 @@ class OnboardingProfileForm : ComponentActivity() {
                     color = Color.White,
                     shape = RoundedCornerShape(12.dp),
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.add_photo_icon),
-                        contentDescription = "add_photo_icon",
-                        modifier = Modifier.padding(vertical = 12.dp, horizontal = 24.dp)
-                    )
+                    if (profilePicture == null) {
+                        Image(
+                            painter = painterResource(id = R.drawable.add_photo_icon),
+                            contentDescription = "add_photo_icon",
+                            modifier = Modifier.padding(vertical = 12.dp, horizontal = 24.dp)
+                        )
+                    } else {
+                        Image(
+                            bitmap = profilePicture.asImageBitmap(),
+                            contentDescription = "profile_picture_thumbnail",
+                            modifier = Modifier.padding(vertical = 12.dp, horizontal = 24.dp)
+                        )
+                    }
                 }
             }
             Box(modifier = textFieldBoxModifier) {
@@ -164,11 +175,12 @@ class OnboardingProfileForm : ComponentActivity() {
         resultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
-                    imageBitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        result.data?.getParcelableExtra("data", Bitmap::class.java)
-                    } else {
-                        @Suppress("DEPRECATION") result.data?.extras?.get("data") as Bitmap
-                    }
+                    profilePictureState.value =
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            result.data?.getParcelableExtra("data", Bitmap::class.java)
+                        } else {
+                            @Suppress("DEPRECATION") result.data?.extras?.get("data") as Bitmap
+                        }
                 }
             }
     }
