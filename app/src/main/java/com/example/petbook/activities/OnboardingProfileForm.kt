@@ -48,6 +48,7 @@ import com.example.petbook.components.FormField
 import com.example.petbook.components.FormFieldArea
 import com.example.petbook.ui.theme.PetBookTheme
 import com.example.petbook.util.OnboardingStatus
+import com.example.petbook.util.bitmapToBase64
 import com.example.petbook.util.getCurrentUser
 import com.example.petbook.util.storeDocument
 import com.google.firebase.Firebase
@@ -206,13 +207,6 @@ class OnboardingProfileForm : ComponentActivity() {
                 Text(text = "Continuar")
             }
         }
-    }
-
-    private fun bitmapToBase64(bitmap: Bitmap): String {
-        val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream) // or JPEG
-        val byteArray = outputStream.toByteArray()
-        return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 
     private fun submitProfileInfo(
