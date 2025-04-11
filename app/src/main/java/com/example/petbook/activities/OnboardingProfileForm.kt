@@ -5,6 +5,8 @@ import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Base64
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -45,6 +47,12 @@ import com.example.petbook.R
 import com.example.petbook.components.FormField
 import com.example.petbook.components.FormFieldArea
 import com.example.petbook.ui.theme.PetBookTheme
+import com.example.petbook.util.OnboardingStatus
+import com.example.petbook.util.getCurrentUser
+import com.example.petbook.util.storeDocument
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
+import java.io.ByteArrayOutputStream
 
 
 class OnboardingProfileForm : ComponentActivity() {
@@ -163,12 +171,70 @@ class OnboardingProfileForm : ComponentActivity() {
                     disabledContainerColor = ButtonDefaults.buttonColors().disabledContainerColor,
                     disabledContentColor = ButtonDefaults.buttonColors().disabledContentColor
                 ), modifier = Modifier.padding(vertical = 8.dp), onClick = {
-                    val intent = Intent(this@OnboardingProfileForm, OnboardingPetForm::class.java)
-                    startActivity(intent)
+                    if (profilePicture == null) {
+                        Toast.makeText(
+                            this@OnboardingProfileForm,
+                            "Por favor, agregue una foto de perfil",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@Button
+                    }
+                    if (nameTextFieldState.text.isEmpty()) {
+                        Toast.makeText(
+                            this@OnboardingProfileForm,
+                            "Por favor, agregue su nombre",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@Button
+                    }
+                    if (nickNameTextFieldState.text.isEmpty()) {
+                        Toast.makeText(
+                            this@OnboardingProfileForm,
+                            "Por favor, agregue un nombre de usuario",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@Button
+                    }
+                    submitProfileInfo(
+                        bitmapToBase64(profilePicture),
+                        nameTextFieldState.text.toString(),
+                        nickNameTextFieldState.text.toString(),
+                        townTextFieldState.text.toString(),
+                        descriptionTextFieldState.text.toString(),
+                    )
                 }) {
                 Text(text = "Continuar")
             }
         }
+    }
+
+    private fun bitmapToBase64(bitmap: Bitmap): String {
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream) // or JPEG
+        val byteArray = outputStream.toByteArray()
+        return Base64.encodeToString(byteArray, Base64.DEFAULT)
+    }
+
+    private fun submitProfileInfo(
+        profilePicture: String, name: String, nickname: String, town: String, description: String
+    ) {
+        val user = getCurrentUser()
+        storeDocument(
+            Firebase.firestore, path = "users", document = user!!.uid, data = hashMapOf(
+            "profilePicture" to profilePicture,
+            "name" to name,
+            "nickname" to nickname,
+            "town" to town,
+            "description" to description,
+            "onboardingStatus" to OnboardingStatus.PROFILE_COMPLETE
+        ), onSuccess = {
+            val intent = Intent(this, OnboardingPetForm::class.java)
+            startActivity(intent)
+        }, onFail = {
+            Toast.makeText(
+                this, "Ocurrio un problema al actualizar su perfil", Toast.LENGTH_SHORT
+            ).show()
+        })
     }
 
     private fun createResultLauncher() {

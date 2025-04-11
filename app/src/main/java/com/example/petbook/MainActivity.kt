@@ -4,19 +4,19 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import com.example.petbook.activities.LoginActivity
+import com.example.petbook.util.getCurrentUser
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        auth = Firebase.auth
 
-        val intent = if(auth.currentUser != null) {
+        val currentUser = getCurrentUser()
+        val intent = if(currentUser != null) {
             Intent(this, LoginActivity::class.java)
         } else {
             // TODO Go to feed (feed unavailable atm, back to login instead)

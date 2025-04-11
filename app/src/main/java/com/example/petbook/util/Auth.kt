@@ -1,10 +1,18 @@
 package com.example.petbook.util
 
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.auth
+import com.google.firebase.auth.ktx.auth
 
 enum class OnboardingStatus {
     NOT_STARTED, PROFILE_COMPLETE, PET_PROFILE_COMPLETE, ERROR
+}
+
+fun getCurrentUser(): FirebaseUser? {
+    val auth = Firebase.auth
+    return auth.currentUser
 }
 
 fun passwordReset(
