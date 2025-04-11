@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
@@ -56,16 +57,19 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.asImageBitmap
+import com.example.petbook.components.AlertDialogExample
 import com.example.petbook.util.OnboardingStatus
 import com.example.petbook.util.bitmapToBase64
 import com.example.petbook.util.getCurrentUser
 import com.example.petbook.util.storeDocument
+import com.example.petbook.util.updateDocument
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
 class OnboardingPetForm : ComponentActivity() {
     private lateinit var resultLauncher: ActivityResultLauncher<Intent>
     private var petPictureState: MutableState<Bitmap?> = mutableStateOf(null)
+    private var showModal = mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +77,7 @@ class OnboardingPetForm : ComponentActivity() {
         createResultLauncher()
         setContent {
             val petPicture by petPictureState
+            val showModal by showModal
             PetBookTheme(darkTheme = false, dynamicColor = false) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Surface(
@@ -90,7 +95,7 @@ class OnboardingPetForm : ComponentActivity() {
                                 fontSize = 32.sp,
                                 textAlign = TextAlign.Center
                             )
-                            PetProfileForm(petPicture)
+                            PetProfileForm(petPicture, showModal)
                         }
                     }
                 }
@@ -99,7 +104,7 @@ class OnboardingPetForm : ComponentActivity() {
     }
 
     @Composable
-    private fun PetProfileForm(petPicture: Bitmap?) {
+    private fun PetProfileForm(petPicture: Bitmap?, showModal: Boolean) {
         val agesList = (0..30).toList()
         val petNameTextFieldState by remember { mutableStateOf(TextFieldState()) }
         val petRaceTextFieldState by remember { mutableStateOf(TextFieldState()) }
@@ -194,6 +199,25 @@ class OnboardingPetForm : ComponentActivity() {
                 textFieldState = descriptionTextFieldState,
                 maxHeightInLines = 8
             )
+            if (showModal) {
+                AlertDialogExample(
+                    onDismissRequest = {
+                        this@OnboardingPetForm.showModal.value = false
+                        val intent = Intent(this@OnboardingPetForm, MainScreen::class.java)
+                        startActivity(intent)
+                        finish()
+                    }, onConfirmation = {
+                        this@OnboardingPetForm.showModal.value = false
+
+                        // Limpiar los campos del formulario
+                        this@OnboardingPetForm.petPictureState.value = null
+                        petNameTextFieldState.clearText()
+                        petRaceTextFieldState.clearText()
+                        descriptionTextFieldState.clearText()
+                        selectedAge = 0
+                    }, "Continuar", "Desea agregar otra mascota?"
+                )
+            }
             Button(
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onPrimary,
@@ -244,23 +268,15 @@ class OnboardingPetForm : ComponentActivity() {
                     this, "Ocurrio un problema al actualizar su perfil", Toast.LENGTH_SHORT
                 ).show()
             })
-        storeDocument(
-            Firebase.firestore,
-            path = "users",
-            document = user.uid,
-            data = hashMapOf(
-                "onboardingStatus" to OnboardingStatus.PET_PROFILE_COMPLETE,
-            ),
-            onSuccess = {
-                Toast.makeText(this, "Registro terminado", Toast.LENGTH_SHORT).show()
-                // TODO go to feed (unimplemented)
-                finish()
-            },
-            onFail = {
+        updateDocument(
+            Firebase.firestore, path = "users", document = user.uid, data = hashMapOf(
+                "onboardingStatus" to OnboardingStatus.ONBOARDING_COMPLETE,
+            ), onSuccess = {}, onFail = {
                 Toast.makeText(
                     this, "Ocurrio un problema al actualizar su perfil", Toast.LENGTH_SHORT
                 ).show()
             })
+        showModal.value = true
     }
 
     private fun createResultLauncher() {

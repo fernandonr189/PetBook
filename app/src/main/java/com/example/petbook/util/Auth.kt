@@ -4,10 +4,9 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
-import com.google.firebase.auth.ktx.auth
 
 enum class OnboardingStatus {
-    NOT_STARTED, PROFILE_COMPLETE, PET_PROFILE_COMPLETE, ERROR
+    NOT_STARTED, PROFILE_COMPLETE, ONBOARDING_COMPLETE, ERROR
 }
 
 fun getCurrentUser(): FirebaseUser? {

@@ -356,7 +356,10 @@ class LoginActivity : ComponentActivity() {
                         this, OnboardingPetForm::class.java
                     )
 
-                    OnboardingStatus.PET_PROFILE_COMPLETE -> TODO()
+                    OnboardingStatus.ONBOARDING_COMPLETE -> Intent(
+                        this, MainScreen::class.java
+                    )
+
                     OnboardingStatus.ERROR -> TODO()
                 }
                 startActivity(intent)
@@ -379,6 +382,7 @@ class LoginActivity : ComponentActivity() {
                 {
                     val intent = Intent(this, OnboardingProfileForm::class.java)
                     startActivity(intent)
+                    finish()
                 },
                 { _ ->
                     Toast.makeText(

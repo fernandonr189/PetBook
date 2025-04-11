@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import com.example.petbook.activities.LoginActivity
+import com.example.petbook.activities.MainScreen
 import com.example.petbook.util.getCurrentUser
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -19,8 +20,7 @@ class MainActivity : ComponentActivity() {
         val intent = if(currentUser != null) {
             Intent(this, LoginActivity::class.java)
         } else {
-            // TODO Go to feed (feed unavailable atm, back to login instead)
-            Intent(this, LoginActivity::class.java)
+            Intent(this, MainScreen::class.java)
         }
         startActivity(intent)
         finish()

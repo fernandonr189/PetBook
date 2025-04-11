@@ -1,15 +1,31 @@
 package com.example.petbook.util
+
 import com.google.firebase.firestore.FirebaseFirestore
 
 fun storeDocument(
     db: FirebaseFirestore,
     path: String,
     document: String,
-    data: Any,
+    data: Map<String, Any>,
     onSuccess: () -> Unit,
     onFail: (String?) -> Unit
 ) {
     db.collection(path).document(document).set(data).addOnSuccessListener {
+        onSuccess()
+    }.addOnFailureListener { exception ->
+        onFail(exception.message)
+    }
+}
+
+fun updateDocument(
+    db: FirebaseFirestore,
+    path: String,
+    document: String,
+    data: Map<String, Any>,
+    onSuccess: () -> Unit,
+    onFail: (String?) -> Unit
+) {
+    db.collection(path).document(document).update(data).addOnSuccessListener {
         onSuccess()
     }.addOnFailureListener { exception ->
         onFail(exception.message)
