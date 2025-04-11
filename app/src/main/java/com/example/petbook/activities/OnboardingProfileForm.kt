@@ -1,10 +1,15 @@
 package com.example.petbook.activities
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,7 +46,12 @@ import com.example.petbook.ui.theme.PetBookTheme
 
 
 class OnboardingProfileForm : ComponentActivity() {
+
+    private lateinit var resultLauncher: ActivityResultLauncher<Intent>
+    private var imageBitmap: Bitmap? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        createResultLauncher()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -84,6 +94,26 @@ class OnboardingProfileForm : ComponentActivity() {
                 .fillMaxWidth()
                 .padding(32.dp)
         ) {
+            Column(
+                modifier = Modifier.padding(bottom = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("Añadir foto de perfil", modifier = Modifier.padding(bottom = 8.dp))
+                Surface(
+                    onClick = {
+                        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                        resultLauncher.launch(intent)
+                    },
+                    color = Color.White,
+                    shape = RoundedCornerShape(12.dp),
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.add_photo_icon),
+                        contentDescription = "add_photo_icon",
+                        modifier = Modifier.padding(vertical = 12.dp, horizontal = 24.dp)
+                    )
+                }
+            }
             Box(modifier = textFieldBoxModifier) {
                 FormField(
                     text = "Nombre:",
@@ -108,22 +138,6 @@ class OnboardingProfileForm : ComponentActivity() {
                     textFieldState = townTextFieldState
                 )
             }
-            Column(
-                modifier = Modifier.padding(vertical = 32.dp, horizontal = 0.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text("Añadir foto de perfil", modifier = Modifier.padding(bottom = 8.dp))
-                Surface(
-                    color = Color.White,
-                    shape = RoundedCornerShape(12.dp),
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.add_photo_icon),
-                        contentDescription = "add_photo_icon",
-                        modifier = Modifier.padding(vertical = 12.dp, horizontal = 24.dp)
-                    )
-                }
-            }
             Text("Añade una breve descripción a tu perfil:")
             FormFieldArea(
                 modifier = Modifier.fillMaxWidth(),
@@ -137,14 +151,25 @@ class OnboardingProfileForm : ComponentActivity() {
                     contentColor = MaterialTheme.colorScheme.background,
                     disabledContainerColor = ButtonDefaults.buttonColors().disabledContainerColor,
                     disabledContentColor = ButtonDefaults.buttonColors().disabledContentColor
-                ),
-                modifier = Modifier.padding(vertical = 8.dp),
-                onClick = {
+                ), modifier = Modifier.padding(vertical = 8.dp), onClick = {
                     val intent = Intent(this@OnboardingProfileForm, OnboardingPetForm::class.java)
                     startActivity(intent)
                 }) {
                 Text(text = "Continuar")
             }
         }
+    }
+
+    private fun createResultLauncher() {
+        resultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    imageBitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        result.data?.getParcelableExtra("data", Bitmap::class.java)
+                    } else {
+                        @Suppress("DEPRECATION") result.data?.extras?.get("data") as Bitmap
+                    }
+                }
+            }
     }
 }
